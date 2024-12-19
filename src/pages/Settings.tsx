@@ -1,7 +1,36 @@
+import { useEffect, useState } from 'react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import userThree from '../images/user/user-03.png';
+import { getProfile } from '../api/helper';
+import { useForm, SubmitHandler } from "react-hook-form"
+
+type Inputs = {
+  name:string
+  email: string
+  mobileNumber: string
+  description:string
+}
 
 const Settings = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>()
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data)
+
+  const [info, setInfo] = useState<any>(null)
+  const getProfileData = async () => {
+    const response = await getProfile()
+    setInfo(response.data.data)
+    // setValue({"name":response.data.data.name})
+  }
+  useEffect(() => {
+    getProfileData()
+  }, [])
+
+  console.log(info, '==>>info')
+
   return (
     <>
       <div className="mx-auto max-w-270">
@@ -16,7 +45,7 @@ const Settings = () => {
                 </h3>
               </div>
               <div className="p-7">
-                <form action="#">
+                <form  onSubmit={handleSubmit(onSubmit)} >
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
                     <div className="w-full sm:w-1/2">
                       <label
@@ -54,11 +83,12 @@ const Settings = () => {
                         <input
                           className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
-                          name="fullName"
                           id="fullName"
                           placeholder="Devid Jhon"
-                          defaultValue="Devid Jhon"
+                          defaultValue={info?.name}
+                          {...register("name", { required: true })}
                         />
+                        {errors.name && <span>This field is required</span>}
                       </div>
                     </div>
 
@@ -75,7 +105,7 @@ const Settings = () => {
                         name="phoneNumber"
                         id="phoneNumber"
                         placeholder="+990 3343 7865"
-                        defaultValue="+990 3343 7865"
+                        defaultValue={info?.mobileNumber}
                       />
                     </div>
                   </div>
@@ -118,13 +148,14 @@ const Settings = () => {
                         type="email"
                         name="emailAddress"
                         id="emailAddress"
+                        disabled
                         placeholder="devidjond45@gmail.com"
-                        defaultValue="devidjond45@gmail.com"
+                        defaultValue={info?.email}
                       />
                     </div>
                   </div>
 
-                  <div className="mb-5.5">
+                  {/* <div className="mb-5.5">
                     <label
                       className="mb-3 block text-sm font-medium text-black dark:text-white"
                       htmlFor="Username"
@@ -139,7 +170,7 @@ const Settings = () => {
                       placeholder="devidjhon24"
                       defaultValue="devidjhon24"
                     />
-                  </div>
+                  </div> */}
 
                   <div className="mb-5.5">
                     <label
@@ -186,7 +217,7 @@ const Settings = () => {
                         id="bio"
                         rows={6}
                         placeholder="Write your bio here"
-                        defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque posuere fermentum urna, eu condimentum mauris tempus ut. Donec fermentum blandit aliquet."
+                        defaultValue={info?.description}
                       ></textarea>
                     </div>
                   </div>
@@ -220,7 +251,9 @@ const Settings = () => {
                 <form action="#">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="h-14 w-14 rounded-full">
-                      <img src={userThree} alt="User" />
+                      {info &&
+                      <img className="rounded-full" src={info && info?.image ? info?.image : userThree} alt="User" />
+                      }
                     </div>
                     <div>
                       <span className="mb-1.5 text-black dark:text-white">

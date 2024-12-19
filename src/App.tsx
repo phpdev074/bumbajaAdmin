@@ -17,6 +17,8 @@ import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
 import Login from './pages/Components/Login';
+import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,6 +39,7 @@ function App() {
       <Routes>
         {/* Login and Signup routes should be outside the DefaultLayout */}
         <Route
+         index
           path="/login"
           element={
             <>
@@ -67,7 +70,7 @@ function App() {
 
         <Route element={<DefaultLayout />}>
           <Route
-            index
+            path='/dashboard'
             element={
               <>
                 <PageTitle title=" Dashboard " />
@@ -159,6 +162,11 @@ function App() {
           />
         </Route>
       </Routes>
+      <ToastContainer
+        position="top-center"
+        className="custom-toast-container"
+        bodyClassName="custom-toast-body"
+      />
     </>
   );
 }

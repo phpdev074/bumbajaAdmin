@@ -1,36 +1,55 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
+import { AuthLogin } from '../../api/helper'
+import { useForm, SubmitHandler } from "react-hook-form"
+import { ShowToast } from '../../helpers/ToastService';
 
+type Inputs = {
+    email: string
+    password: string
+}
 const Login: React.FC = () => {
     const navigate = useNavigate()
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<Inputs>()
+
+    const onSubmit: SubmitHandler<Inputs> = async(data:any) =>{
+        try {
+            const newData = await AuthLogin(data)
+            localStorage.setItem("token",newData.data.data.token)
+            localStorage.setItem("userDetails",JSON.stringify(newData.data.data.userData))
+            ShowToast("Login Successfully","success")
+            navigate('/dashboard')
+        } catch (error) {
+            console.log(error,'==>')
+        }
+       
+    }
     return (
         <>
             <div className="dark:bg-boxdark-2 dark:text-bodydark">
-                {/* <!-- ===== Page Wrapper Start ===== --> */}
                 <div className="flex h-screen overflow-hidden">
-                    {/* <!-- ===== Sidebar Start ===== --> */}
-                    {/* <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
-                    {/* <!-- ===== Sidebar End ===== --> */}
 
-                    {/* <!-- ===== Content Area Start ===== --> */}
                     <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-                        {/* <!-- ===== Header Start ===== --> */}
-                        {/* <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
-                        {/* <!-- ===== Header End ===== --> */}
 
-                        {/* <!-- ===== Main Content Start ===== --> */}
                         <main>
                             <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-                                {/* < Outlet /> */}
                                 <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                                     <div className="flex flex-wrap items-center">
                                         <div className="hidden w-full xl:block xl:w-1/2">
                                             <div className="py-17.5 px-26 text-center">
-                                                <Link className="mb-5.5 inline-block" to="/">
-                                                    <img className="hidden dark:block" src={Logo} alt="Logo" />
-                                                    <img className="dark:hidden" src={LogoDark} alt="Logo" />
+                                                <Link className="mb-5.5 inline-block" to="/login">
+
+                                                <img className="hidden dark:block" src={Logo} alt="Logo" />
+                                                <img className="dark:hidden" src={LogoDark} alt="Logo" />
+
+                                                    {/* <img className="hidden dark:block" src={Logo} alt="Logo" />
+                                                    <img className="dark:hidden" src={LogoDark} alt="Logo" /> */}
                                                 </Link>
 
                                                 <p className="2xl:px-20">
@@ -170,7 +189,7 @@ const Login: React.FC = () => {
                                                     Sign In
                                                 </h2>
 
-                                                <form>
+                                                <form  onSubmit={handleSubmit(onSubmit)} >
                                                     <div className="mb-4">
                                                         <label className="mb-2.5 block font-medium text-black dark:text-white">
                                                             Email
@@ -180,7 +199,9 @@ const Login: React.FC = () => {
                                                                 type="email"
                                                                 placeholder="Enter your email"
                                                                 className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                                                {...register("email", { required: true })}
                                                             />
+                                                           {errors.email && <span className="text-red-500">Email is required</span>}
 
                                                             <span className="absolute right-4 top-4">
                                                                 <svg
@@ -211,7 +232,10 @@ const Login: React.FC = () => {
                                                                 type="password"
                                                                 placeholder="6+ Characters, 1 Capital letter"
                                                                 className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                                                            />
+                                                     
+                                                                {...register("password", { required: true })}
+                                                         />
+                                                          {errors.password && <span className="text-red-500" >Password is required</span>}
 
                                                             <span className="absolute right-4 top-4">
                                                                 <svg
@@ -239,7 +263,7 @@ const Login: React.FC = () => {
 
                                                     <div className="mb-5">
                                                         <input
-                                                        onClick={()=>(navigate('/'))}
+                                                            // onClick={() => (navigate('/'))}
                                                             type="submit"
                                                             value="Sign In"
                                                             className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
@@ -283,14 +307,14 @@ const Login: React.FC = () => {
                                     Sign in with Google
                                 </button> */}
 
-                                                    <div className="mt-6 text-center">
+                                                    {/* <div className="mt-6 text-center">
                                                         <p>
                                                             Don’t have any account?{' '}
                                                             <Link to="/auth/signup" className="text-primary">
                                                                 Sign Up
                                                             </Link>
                                                         </p>
-                                                    </div>
+                                                    </div> */}
                                                 </form>
                                             </div>
                                         </div>

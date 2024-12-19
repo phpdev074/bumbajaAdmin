@@ -1,10 +1,45 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-01.png';
 
 const DropdownUser = () => {
+  const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState<any | null>(null);
+
+  useEffect(() => {
+   
+    const getUserDetails = (): any | null => {
+      const storedData = localStorage.getItem('userDetails');
+      
+      if (!storedData) {
+        return null; // Return null if no user data exists
+      }
+
+      try {
+        return JSON.parse(storedData);
+      } catch (error) {
+        console.error('Error parsing userDetails from localStorage:', error);
+        return null;
+      }
+    };
+
+    const data = getUserDetails();
+
+    console.log(data,'==>>data')
+    setUser(data); // Set the state with fetched user data
+  }, []);
+
+
+  const handelLogout = () => {
+    const isConfirmed = window.confirm("Are you sure you want to Log out?");
+    if (isConfirmed) {
+      localStorage.removeItem("token")
+      localStorage.removeItem("userDetails")
+      navigate('/login')
+    }
+  }
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -15,13 +50,13 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {user?.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          {/* <span className="block text-xs">UX Designer</span> */}
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
+          <img src={user && user.image||UserOne} alt="User" className='rounded-full' />
         </span>
 
         <svg
@@ -72,7 +107,7 @@ const DropdownUser = () => {
                 My Profile
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 to="#"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
@@ -92,7 +127,7 @@ const DropdownUser = () => {
                 </svg>
                 My Contacts
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 to="/settings"
@@ -119,7 +154,7 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          <button onClick={() => handelLogout()} className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
             <svg
               className="fill-current"
               width="22"
@@ -137,6 +172,7 @@ const DropdownUser = () => {
                 fill=""
               />
             </svg>
+
             Log Out
           </button>
         </div>
